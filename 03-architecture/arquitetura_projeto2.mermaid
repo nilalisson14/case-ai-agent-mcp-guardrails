@@ -1,0 +1,46 @@
+flowchart TB
+    U["Analista ou sistema integrador"]
+
+    subgraph ENTRADA["Camada de Entrada"]
+        FU["Lambda Function URL - REST"]
+        MCPS["Servidor MCP<br/>ferramentas expostas"]
+    end
+
+    subgraph AG["Bedrock Agent"]
+        AGT["Agente<br/>decide os proximos passos"]
+        FM["Foundation Model<br/>Nova 2 Lite"]
+        GR["Guardrail<br/>bloqueia linguagem de decisao regulatoria"]
+    end
+
+    subgraph TOOLS["Action Groups"]
+        T1["Lambda: calcular_vencimento"]
+        T2["Lambda: verificar_conformidade"]
+    end
+
+    subgraph RAG["Bedrock Knowledge Base"]
+        KB["Retrieve"]
+        VS["S3 Vectors"]
+    end
+
+    subgraph DADOS["Dados"]
+        S3["Bucket S3<br/>corpus ANVF reaproveitado"]
+    end
+
+    subgraph GOV["Governanca"]
+        CW["CloudWatch Logs"]
+        CT["CloudTrail<br/>trace do agente"]
+    end
+
+    U --> FU
+    U --> MCPS
+    FU --> AGT
+    MCPS --> AGT
+    AGT --> FM
+    AGT -.-> GR
+    AGT --> T1
+    AGT --> T2
+    AGT --> KB
+    KB <--> VS
+    S3 --> VS
+    AGT -.-> CW
+    AGT -.-> CT
